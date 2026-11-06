@@ -4,3 +4,11 @@ test = "test"
 out = "out"
 libs = ["lib"]
 solc = "0.8.20"
+
+# RPC is supplied by the runner via the BASE_RPC_URL environment variable
+# (any Base mainnet endpoint). The fork block is pinned inside the test
+# itself (vm.createSelectFork), so the run is one command:
+#
+#   BASE_RPC_URL=<your Base RPC endpoint> forge test
+[rpc_endpoints]
+base = "${BASE_RPC_URL}"

@@ -31,7 +31,8 @@ interface IBuildersV4 {
     function minimalWithdrawLockPeriod() external view returns (uint256);
 }
 
-/// @notice Fork PoC (Base mainnet fork, pinned block): a permissionless subnet
+/// @notice Fork PoC (Base mainnet fork, block pinned in-test via
+/// vm.createSelectFork; RPC from the BASE_RPC_URL env var): a permissionless subnet
 /// creator (subnet admin of their OWN subnet) retroactively raises the subnet
 /// withdraw lock to type(uint128).max via editSubnet, permanently locking a
 /// staker who deposited under a 7-day lock. No protocol-privileged account is
@@ -45,6 +46,10 @@ contract EditSubnetLockTest is Test {
     address victim = makeAddr("victim");
     uint256 constant STAKE = 100 ether;
     uint128 constant ORIG_LOCK = 604800; // 7 days == live global minimum
+
+    function setUp() public {
+        vm.createSelectFork("base", 53428250);
+    }
 
     function test_EditSubnet_PermanentLock() public {
         assertEq(builders.minimalWithdrawLockPeriod(), ORIG_LOCK, "live min lock sanity");
@@ -119,6 +124,10 @@ contract EditSubnetLock100yTest is Test {
     IERC20 mor = IERC20(0x7431aDa8a591C955a994a21710752EF9b882b8e3);
     address attacker = makeAddr("subnetCreator2");
     address victim = makeAddr("victim2");
+
+    function setUp() public {
+        vm.createSelectFork("base", 53428250);
+    }
 
     function test_EditSubnet_100yLock() public {
         Subnet memory s = Subnet("poc-lock-subnet-laneC-100y", attacker, 0, 604800, 0, 1 ether, attacker);
